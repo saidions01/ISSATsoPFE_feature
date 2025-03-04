@@ -1,4 +1,8 @@
 {
   "name": "issatSoPFEWebsite",
-  "slug": "issatSoPFEWebsite"
+  "slug": "issatSoPFEWebsite",
+  "expo": {
+  "newArchEnabled": true
 }
+}
+
