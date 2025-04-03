@@ -40,13 +40,11 @@ const LoginScreen = ({ navigation }) => {
 
         <Text style={styles.forgotPassword}>Forgot Password?</Text>
 
-        <TouchableOpacity style={styles.button}>
-          <Text
-            style={styles.buttonText}
-            onPress={() => navigation.navigate("Home")}
-          >
-            LOGIN
-          </Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Home")}
+        >
+          <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableOpacity>
 
         <Text style={styles.footerText}>

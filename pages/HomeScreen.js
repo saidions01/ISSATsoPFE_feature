@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
-  Image,
   StyleSheet,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import MenuPage from "./MenuPage";
+import Messagerie from "./Messagerie";
+const { width } = Dimensions.get("window");
 
 const events = [
   {
@@ -41,14 +44,20 @@ const events = [
 ];
 
 const HomeScreen = ({ navigation }) => {
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible);
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+        <TouchableOpacity onPress={toggleMenu}>
           <Ionicons name="menu" size={28} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Upcoming events</Text>
+        <Text style={styles.headerTitle}>Upcoming Events</Text>
         <TouchableOpacity>
           <Ionicons name="notifications-outline" size={24} color="black" />
         </TouchableOpacity>
@@ -83,9 +92,25 @@ const HomeScreen = ({ navigation }) => {
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
         <Ionicons name="home" size={28} color="black" />
-        <Ionicons name="briefcase-outline" size={28} color="gray" />
-        <Ionicons name="ellipsis-horizontal" size={28} color="gray" />
+        <TouchableOpacity onPress={() => navigation.navigate("Messagerie")}>
+          <Ionicons
+            name="chatbubble-outline"
+            size={28}
+            color="gray"
+            paddingTop={5}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("EditProfile")}>
+          <Ionicons name="person-outline" size={28} color="gray" />
+        </TouchableOpacity>
       </View>
+
+      {menuVisible && (
+        <MenuPage
+          onClose={() => setMenuVisible(false)}
+          navigation={navigation}
+        />
+      )}
     </View>
   );
 };
@@ -111,8 +136,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "#aac4e4",
-    marginRight: 20,
-    marginLeft: 20,
+    marginHorizontal: 20,
     marginBottom: 15,
     padding: 15,
     borderRadius: 10,
@@ -129,7 +153,7 @@ const styles = StyleSheet.create({
   bottomNav: {
     flexDirection: "row",
     justifyContent: "space-around",
-    paddingVertical: 10,
+    paddingVertical: 20,
     backgroundColor: "#f0f0f0",
   },
 });
