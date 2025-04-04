@@ -153,6 +153,7 @@ const styles = StyleSheet.create({
   bottomNav: {
     flexDirection: "row",
     justifyContent: "space-around",
+    alignItems: "center",
     paddingVertical: 20,
     backgroundColor: "#f0f0f0",
   },
