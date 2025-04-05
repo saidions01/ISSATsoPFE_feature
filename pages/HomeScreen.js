@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import MenuPage from "./MenuPage";
-import Messagerie from "./Messagerie";
+import BottomNav from "./components/BottomNav";
 const { width } = Dimensions.get("window");
 
 const events = [
@@ -90,20 +90,7 @@ const HomeScreen = ({ navigation }) => {
       />
 
       {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <Ionicons name="home" size={28} color="black" />
-        <TouchableOpacity onPress={() => navigation.navigate("Messagerie")}>
-          <Ionicons
-            name="chatbubble-outline"
-            size={28}
-            color="gray"
-            paddingTop={5}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("EditProfile")}>
-          <Ionicons name="person-outline" size={28} color="gray" />
-        </TouchableOpacity>
-      </View>
+      <BottomNav navigation={navigation} />
 
       {menuVisible && (
         <MenuPage
