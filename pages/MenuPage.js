@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import UploadScreen from "./UploadScreen.js";
 import AddTimeConstraint from "./AddTimeConstraint.js";
+import ConsultListOfStudents from "./ConsultListOfStudents.js";
 const MenuPage = ({ onClose, navigation }) => {
   return (
     <View style={styles.container}>
@@ -30,7 +31,10 @@ const MenuPage = ({ onClose, navigation }) => {
         <Text style={styles.text}>Consult Reports</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuItem}>
+      <TouchableOpacity 
+      style={styles.menuItem}
+      onPress={() => navigation.navigate("ConsultListOfStudents")}
+      >
         <Ionicons name="list-outline" size={20} color="black" />
         <Text style={styles.text}>List of Students</Text>
       </TouchableOpacity>

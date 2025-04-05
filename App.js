@@ -10,6 +10,7 @@ import UploadScreen from "./pages/UploadScreen.js";
 import Messagerie from "./pages/Messagerie.js";
 import EditProfile from "./pages/EditProfile.js";
 import AddTimeConstraint from "./pages/AddTimeConstraint.js";
+import ConsultListOfStudents from "./pages/ConsultListOfStudents.js";
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
         <Stack.Screen name="Messagerie" component={Messagerie} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="AddTimeConstraint" component={AddTimeConstraint} />
+        <Stack.Screen name="ConsultListOfStudents" component={ConsultListOfStudents}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
