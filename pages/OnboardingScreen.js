@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import * as Font from "expo-font";
-import AppLoading from "expo-app-loading";
+import { ActivityIndicator } from "react-native";
+
 const loadFonts = async () => {
   await Font.loadAsync({
     "Italia-Moderna": require("../assets/fonts/GlobalFont.ttf"),
@@ -16,7 +17,11 @@ const OnboardingScreen = ({ navigation }) => {
   }, []);
 
   if (!fontsLoaded) {
-    return <AppLoading />;
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#4E4E4E" />
+      </View>
+    );
   }
 
   return (
@@ -25,25 +30,34 @@ const OnboardingScreen = ({ navigation }) => {
         source={require("../assets/images/logoIssat.png")}
         style={styles.logo}
       />
-      <Text style={styles.tagline}>Make your university experience easier</Text>
-      <Image
-        source={require("../assets/images/level1-dots.png")}
-        style={styles.level1Dots}
-      />
+
+      <Text style={styles.selectText}>Please select your role:</Text>
+
       <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Login")}
+        style={styles.roleButton}
+        onPress={() => navigation.navigate("ProfessorLogin")}
       >
-        <Text style={styles.buttonText}>GET STARTED</Text>
+        <Text style={styles.roleButtonText}>I'm a Professor</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.roleButton}
+        onPress={() => navigation.navigate("AdminLogin")}
+      >
+        <Text style={styles.roleButtonText}>I'm an Admin</Text>
       </TouchableOpacity>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
-  level1Dots: {
-    display: "flex",
+  loadingContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#FFEFE0",
+  },
+  level1Dots: {
     top: 50,
   },
   container: {
@@ -51,7 +65,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#FFEFE0",
-    fontFamily: "Baloo Thambi 2",
   },
   logo: {
     width: 340,
@@ -64,18 +77,43 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto",
     fontSize: 30,
     textAlign: "center",
-    marginBottom: 30,
+    marginBottom: 40,
     color: "#4E4E4E",
   },
-  button: {
+  selectText: {
+    fontSize: 20,
+    fontWeight: "bold",
+
+    marginBottom: 30,
+    color: "#4E4E4E",
+    fontFamily: "Roboto",
+  },
+  roleButton: {
+    backgroundColor: "#fff",
+    borderWidth: 2,
+    borderColor: "#4E4E4E",
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    marginBottom: 15,
+    width: "80%",
+    alignItems: "center",
+  },
+  roleButtonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#4E4E4E",
+    fontFamily: "Roboto",
+  },
+  getStartedButton: {
     backgroundColor: "#FFEFE0",
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 8,
     position: "absolute",
-    bottom: 120,
+    bottom: 60,
     borderWidth: 2,
-    borderColor: "4E4E4E",
+    borderColor: "#4E4E4E",
   },
   buttonText: {
     color: "#4E4E4E",

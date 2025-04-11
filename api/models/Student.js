@@ -7,6 +7,7 @@ const studentSchema = new mongoose.Schema({
   numInscription: String,
   fieldOfStudy: String,
   department: String,
+  supervisor: { type: mongoose.Schema.Types.ObjectId, ref: "Professor" },
 });
 
 module.exports = mongoose.model("Student", studentSchema);

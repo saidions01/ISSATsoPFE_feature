@@ -1,4 +1,3 @@
-import React from "react";
 import {
   View,
   Text,
@@ -11,7 +10,7 @@ import {
 
 const { width, height } = Dimensions.get("window");
 
-const LoginScreen = ({ navigation }) => {
+const ProfessorLoginScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Background Image */}
@@ -22,7 +21,7 @@ const LoginScreen = ({ navigation }) => {
 
       {/* Form Container */}
       <View style={styles.form}>
-        <Text style={styles.title}>Login</Text>
+        <Text style={styles.title}>Professor Login</Text>
 
         <Text style={styles.label}>Email</Text>
         <TextInput
@@ -46,16 +45,6 @@ const LoginScreen = ({ navigation }) => {
         >
           <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableOpacity>
-
-        <Text style={styles.footerText}>
-          Don’t have an account?{" "}
-          <Text
-            style={styles.link}
-            onPress={() => navigation.navigate("Signup")}
-          >
-            SIGN UP
-          </Text>
-        </Text>
       </View>
     </View>
   );
@@ -137,4 +126,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default ProfessorLoginScreen;

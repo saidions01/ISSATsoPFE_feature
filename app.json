@@ -2,7 +2,11 @@
   "name": "issatSoPFEWebsite",
   "slug": "issatSoPFEWebsite",
   "expo": {
-  "newArchEnabled": true
+    "newArchEnabled": true,
+    "extra": {
+      "eas": {
+        "projectId": "bd493177-2fca-44d4-b744-1c6df3058abf"
+      }
+    }
+  }
 }
-}
-
