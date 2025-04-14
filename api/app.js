@@ -1,12 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const bcrypt = require("bcryptjs");
 const uploadRoutes = require("./routes/upload");
 const studentRoutes = require("./routes/student.js");
 const authRoutes = require("./routes/auth.js");
 const uploadProfessorsRoutes = require("./routes/Professor.js");
-
+const userRoutes = require("./routes/User.js");
 const app = express();
 const PORT = 5000;
 
@@ -21,7 +20,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 
 app.use("/api", uploadProfessorsRoutes);
-
+app.use("/api", userRoutes);
 mongoose
   .connect("mongodb://127.0.0.1:27017/studentUploaderDB")
   .then(() => console.log("✅ MongoDB connected"))

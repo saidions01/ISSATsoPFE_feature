@@ -14,7 +14,7 @@ const ConsultListOfStudents = ({ navigation }) => {
 
   const fetchStudents = async () => {
     try {
-      const response = await fetch("http://172.20.10.4:5000/api/students");
+      const response = await fetch("http://localhost:5000/api/students");
       const json = await response.json();
       setStudents(json);
     } catch (error) {

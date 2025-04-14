@@ -94,6 +94,30 @@ const AdminDashboard = () => {
       console.error("Error fetching professors:", error.message);
     }
   };
+
+  const handleCreateAccounts = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/create-professor-accounts",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(`${data.users.length} accounts created and emails sent!`);
+      } else {
+        alert("Error: " + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("An unexpected error occurred.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Admin Dashboard</Text>
@@ -142,6 +166,11 @@ const AdminDashboard = () => {
           </ScrollView>
         )}
       </View>
+
+      <Button
+        title="Create Professor Accounts"
+        onPress={handleCreateAccounts}
+      />
     </View>
   );
 };
