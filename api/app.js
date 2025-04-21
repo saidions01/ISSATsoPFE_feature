@@ -21,6 +21,20 @@ app.use("/api/auth", authRoutes);
 
 app.use("/api", uploadProfessorsRoutes);
 app.use("/api", userRoutes);
+app.post("/api/upload-students", (req, res) => {
+  const students = req.body.students;
+
+  if (!Array.isArray(students)) {
+    return res.status(400).json({ error: "Invalid data format" });
+  }
+
+  // Log to verify incoming data
+  console.log("Received students:", students.length);
+
+  // Do something with the data (e.g., save to database)
+
+  res.status(200).json({ message: "Students uploaded successfully!" });
+});
 mongoose
   .connect("mongodb://127.0.0.1:27017/studentUploaderDB")
   .then(() => console.log("✅ MongoDB connected"))

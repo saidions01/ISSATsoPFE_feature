@@ -20,8 +20,9 @@ const AdminLoginScreen = ({ navigation }) => {
   const handleLogin = async () => {
     try {
       setErrorMessage("");
+      console.log("Trying to login with:", { email, password });
 
-      const res = await axios.post("http://192.168.56.1:5000/api/auth/login", {
+      const res = await axios.post("http://127.0.0.1:5000/api/auth/login", {
         email,
         password,
       });

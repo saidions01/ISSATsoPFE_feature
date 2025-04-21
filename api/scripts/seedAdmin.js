@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { hashPassword } = require("../utils/hash");
 const User = require("../models/User");
 
 const MONGO_URI = "mongodb://127.0.0.1:27017/studentUploaderDB";
@@ -16,11 +15,9 @@ const seedAdmin = async () => {
       return process.exit();
     }
 
-    const hashed = await hashPassword("admin123");
-
     const adminUser = new User({
       email: "saidions15555@gmail.com",
-      password: hashed,
+      password: "admin123",
       role: "admin",
     });
 

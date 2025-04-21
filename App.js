@@ -13,6 +13,9 @@ import EditProfile from "./pages/EditProfile.js";
 import AddTimeConstraint from "./pages/AddTimeConstraint.js";
 import ConsultListOfStudents from "./pages/ConsultListOfStudents.js";
 import AdminDashboard from "./pages/AdminDashboard.js";
+import ProfessorsListScreen from "./pages/ProfessorsListScreen.js";
+import UploadProfessors from "./pages/UploadProfessors.js";
+import ModifyEventsScreen from "./pages/ModifyEventsScreen.js";
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -37,6 +40,12 @@ export default function App() {
           component={ConsultListOfStudents}
         />
         <Stack.Screen name="AdminDashboard" component={AdminDashboard} />
+        <Stack.Screen
+          name="ProfessorsListScreen"
+          component={ProfessorsListScreen}
+        />
+        <Stack.Screen name="UploadProfessors" component={UploadProfessors} />
+        <Stack.Screen name="ModifyEvents" component={ModifyEventsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

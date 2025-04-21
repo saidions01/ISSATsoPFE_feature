@@ -1,4 +1,3 @@
-// UploadStudents.js
 import React, { useState, useRef } from "react";
 import {
   View,
@@ -7,11 +6,12 @@ import {
   StyleSheet,
   Platform,
   Alert,
+  Button,
 } from "react-native";
 import * as XLSX from "xlsx";
 import { Ionicons } from "@expo/vector-icons";
 
-const UploadStudents = ({ navigation }) => {
+const UploadProfessors = ({ navigation }) => {
   const [fileData, setFileData] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -24,19 +24,10 @@ const UploadStudents = ({ navigation }) => {
       const arrayBuffer = event.target.result;
       try {
         const workbook = XLSX.read(arrayBuffer, { type: "array" });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const data = XLSX.utils.sheet_to_json(sheet);
-
-        const formatted = data.map((student) => ({
-          name: student.name || "",
-          lastName: student.lastName || "",
-          cin: student.cin || "",
-          numInscription: student.numInscription || "",
-          fieldOfStudy: student.fieldOfStudy || "",
-          department: student.department || "",
-        }));
-
-        setFileData(formatted);
+        const data = XLSX.utils.sheet_to_json(
+          workbook.Sheets[workbook.SheetNames[0]]
+        );
+        setFileData(data);
       } catch (error) {
         console.error("Error reading file:", error);
         Alert.alert("Error", "Failed to parse the file.");
@@ -62,31 +53,47 @@ const UploadStudents = ({ navigation }) => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/upload-students",
+        "http://127.0.0.1:5000/api/upload-professors",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ students: fileData }),
+          body: JSON.stringify({ professors: fileData }),
         }
       );
 
-      const contentType = response.headers.get("content-type");
-
-      if (!response.ok) {
-        const errorText = contentType?.includes("application/json")
-          ? (await response.json()).error
-          : await response.text();
-        Alert.alert("Error", errorText || "Upload failed.");
-        return;
+      const result = await response.json();
+      if (response.ok) {
+        Alert.alert("Success", "Data uploaded successfully.");
+      } else {
+        Alert.alert("Error", result.message || "Failed to upload data.");
       }
+    } catch (err) {
+      console.error("Upload error:", err);
+      Alert.alert("Error", "Failed to upload data.");
+    }
+  };
+  const handleCreateAccounts = async () => {
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:5000/api/create-professor-accounts",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       const data = await response.json();
-      Alert.alert("Success", data.message || "Upload successful!");
+
+      if (response.ok) {
+        alert(`${data.users.length} accounts created and emails sent!`);
+      } else {
+        alert("Error: " + data.error);
+      }
     } catch (err) {
-      console.error("Fetch error:", err);
-      Alert.alert("Network Error", "Failed to connect to the server.");
+      console.error(err);
+      alert("An unexpected error occurred.");
     }
   };
 
@@ -98,11 +105,10 @@ const UploadStudents = ({ navigation }) => {
       >
         <Ionicons name="arrow-back" size={24} color="#fff" />
       </TouchableOpacity>
-
-      <Text style={styles.title}>Upload your students' sheet</Text>
+      <Text style={styles.title}>Upload your professors' sheet </Text>
 
       <TouchableOpacity style={styles.button} onPress={selectFile}>
-        <Text style={styles.buttonText}>Select Students File (.xlsx)</Text>
+        <Text style={styles.buttonText}>Select Professors File (.xlsx)</Text>
       </TouchableOpacity>
 
       {Platform.OS === "web" && (
@@ -116,8 +122,13 @@ const UploadStudents = ({ navigation }) => {
       )}
 
       <TouchableOpacity style={styles.button} onPress={handleUpload}>
-        <Text style={styles.buttonText}>Upload Students</Text>
+        <Text style={styles.buttonText}>Upload Data</Text>
       </TouchableOpacity>
+
+      <Button
+        title="Create Professor Accounts"
+        onPress={handleCreateAccounts}
+      />
     </View>
   );
 };
@@ -155,4 +166,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UploadStudents;
+export default UploadProfessors;

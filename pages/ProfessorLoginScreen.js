@@ -1,3 +1,5 @@
+import React, { useState } from "react";
+
 import {
   View,
   Text,
@@ -9,8 +11,31 @@ import {
 } from "react-native";
 
 const { width, height } = Dimensions.get("window");
+import axios from "axios";
 
 const ProfessorLoginScreen = ({ navigation }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleLogin = async () => {
+    try {
+      setErrorMessage("");
+      console.log("Trying to login with:", { email, password });
+
+      const res = await axios.post("http://127.0.0.1:5000/api/auth/login", {
+        email,
+        password,
+      });
+
+      console.log("Logged in!", res.data);
+      navigation.navigate("AdminDashboard");
+    } catch (err) {
+      const error =
+        err.response?.data?.message || "Something went wrong. Try again.";
+      setErrorMessage(error);
+    }
+  };
   return (
     <View style={styles.container}>
       {/* Background Image */}
@@ -36,6 +61,10 @@ const ProfessorLoginScreen = ({ navigation }) => {
           placeholder="Enter your password"
           secureTextEntry
         />
+        {/* 🆕 Error message */}
+        {errorMessage ? (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        ) : null}
 
         <Text style={styles.forgotPassword}>Forgot Password?</Text>
 

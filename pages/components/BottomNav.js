@@ -1,23 +1,17 @@
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React from "react";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 const BottomNav = ({ navigation }) => {
   return (
     <View style={styles.bottomNav}>
       <Ionicons name="home" size={28} color="gray" />
-      
-      <TouchableOpacity 
-        onPress={() => navigation.navigate('Messagerie')}
-        
-      >
+
+      <TouchableOpacity onPress={() => navigation.navigate("Messagerie")}>
         <Ionicons name="chatbubble-outline" size={28} color="gray" />
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        onPress={() => navigation.navigate('EditProfile')}
-       
-      >
+      <TouchableOpacity onPress={() => navigation.navigate("EditProfile")}>
         <Ionicons name="person-outline" size={28} color="gray" />
       </TouchableOpacity>
     </View>
@@ -26,12 +20,12 @@ const BottomNav = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
     paddingVertical: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
 });
 
-export default BottomNav; 
+export default BottomNav;
