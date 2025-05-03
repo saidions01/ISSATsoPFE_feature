@@ -72,7 +72,15 @@ const HomeScreen = ({ navigation }) => {
               </Text>
               <View style={styles.eventInfo}>
                 <Ionicons name="calendar" size={16} />
-                <Text> {item.date}</Text>
+                <Text>
+  {new Date(item.date).toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })}
+</Text>
+
               </View>
               <View style={styles.eventInfo}>
                 <Ionicons name="location" size={16} />

@@ -8,6 +8,13 @@ const uploadProfessorsRoutes = require("./routes/Professor.js");
 const userRoutes = require("./routes/User.js");
 const timeConstraintRoutes = require("./routes/timeConstraint");
 const soutenancesRoute = require("./routes/soutenancesRoutes.js");
+const Soutenance = require("./models/Soutenance.js");
+
+
+
+
+
+
 const app = express();
 const PORT = 5000;
 
@@ -36,7 +43,18 @@ app.post("/api/upload-students", (req, res) => {
 });
 
 app.use("/api", timeConstraintRoutes);
-app.use("/api", soutenancesRoute);
+
+app.get("/api/soutenances", async (req, res) => {
+  try {
+    const soutenances = await Soutenance.find()
+      .populate("salleId", "name") // Only bring salle name
+      .populate("sujetPfeId", "title"); // Only bring sujetPfe title
+
+    res.json({ soutenances });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
 mongoose
   .connect("mongodb://127.0.0.1:27017/studentUploaderDB")
   .then(() => console.log("✅ MongoDB connected"))

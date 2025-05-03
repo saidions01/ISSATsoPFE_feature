@@ -3,7 +3,7 @@ const router = express.Router();
 
 const Soutenance = require("../models/Soutenance.js");
 
-app.get("/api/soutenances", async (req, res) => {
+router.get("/api/soutenances", async (req, res) => {
   try {
     const soutenances = await Soutenance.find()
       .populate("salleId", "name") // Only bring salle name
