@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#7da6cf",
     width: "100%",
+    height: "100%",
   },
   title: {
     fontSize: 24,

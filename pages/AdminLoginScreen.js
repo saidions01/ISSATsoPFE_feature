@@ -71,7 +71,10 @@ const AdminLoginScreen = ({ navigation }) => {
 
         <Text style={styles.forgotPassword}>Forgot Password?</Text>
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("AdminDashboard")}
+        >
           <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableOpacity>
       </View>

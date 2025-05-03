@@ -6,6 +6,8 @@ const studentRoutes = require("./routes/student.js");
 const authRoutes = require("./routes/auth.js");
 const uploadProfessorsRoutes = require("./routes/Professor.js");
 const userRoutes = require("./routes/User.js");
+const timeConstraintRoutes = require("./routes/timeConstraint");
+const soutenancesRoute = require("./routes/soutenancesRoutes.js");
 const app = express();
 const PORT = 5000;
 
@@ -28,13 +30,13 @@ app.post("/api/upload-students", (req, res) => {
     return res.status(400).json({ error: "Invalid data format" });
   }
 
-  // Log to verify incoming data
   console.log("Received students:", students.length);
-
-  // Do something with the data (e.g., save to database)
 
   res.status(200).json({ message: "Students uploaded successfully!" });
 });
+
+app.use("/api", timeConstraintRoutes);
+app.use("/api", soutenancesRoute);
 mongoose
   .connect("mongodb://127.0.0.1:27017/studentUploaderDB")
   .then(() => console.log("✅ MongoDB connected"))

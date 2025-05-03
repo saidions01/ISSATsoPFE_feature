@@ -17,6 +17,12 @@ const AdminNav = ({ navigation }) => {
       >
         <Text style={styles.navButtonText}>Modify Events</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.navButton}
+        onPress={() => navigation.navigate("GenerateTimeTable")}
+      >
+        <Text style={styles.navButtonText}>Generate Time Table</Text>
+      </TouchableOpacity>
     </View>
   );
 };

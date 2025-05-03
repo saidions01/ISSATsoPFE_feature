@@ -16,6 +16,7 @@ import AdminDashboard from "./pages/AdminDashboard.js";
 import ProfessorsListScreen from "./pages/ProfessorsListScreen.js";
 import UploadProfessors from "./pages/UploadProfessors.js";
 import ModifyEventsScreen from "./pages/ModifyEventsScreen.js";
+import GenerateTimeTableScreen from "./pages/GenerateTimeTableScreen.js";
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -46,6 +47,10 @@ export default function App() {
         />
         <Stack.Screen name="UploadProfessors" component={UploadProfessors} />
         <Stack.Screen name="ModifyEvents" component={ModifyEventsScreen} />
+        <Stack.Screen
+          name="GenerateTimeTable"
+          component={GenerateTimeTableScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

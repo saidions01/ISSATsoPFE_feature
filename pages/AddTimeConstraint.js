@@ -1,148 +1,188 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Button } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import ChooseDate from "./components/ChooseDate";
+import ChooseTime from "./components/ChooseTime";
+
 const AddTimeConstraint = ({ navigation }) => {
-  const [selectedReason, setSelectedReason] = useState("Reason");
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [reason, setReason] = useState("Reason");
+  const [date, setDate] = useState(null);
   const [fromTime, setFromTime] = useState("13:30");
   const [toTime, setToTime] = useState("15:00");
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+  const [openDateModal, setOpenDateModal] = useState(false);
+  const [openTimeModal, setOpenTimeModal] = useState(false);
   const [timeType, setTimeType] = useState("from");
 
-  const showDatePicker = () => setDatePickerVisibility(true);
-  const hideDatePicker = () => setDatePickerVisibility(false);
-  const showTimePicker = (type) => {
-    setTimeType(type);
-    setTimePickerVisibility(true);
-  };
-  const hideTimePicker = () => setTimePickerVisibility(false);
-
-  const handleDateConfirm = (date) => {
-    setSelectedDate(date.toDateString());
-    hideDatePicker();
-  };
-
-  const handleTimeConfirm = (time) => {
-    const formattedTime = time.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    if (timeType === "from") {
-      setFromTime(formattedTime);
-    } else {
-      setToTime(formattedTime);
+  const handleSave = async () => {
+    if (!reason || !date || !fromTime || !toTime) {
+      alert("Please fill all fields");
+      return;
     }
-    hideTimePicker();
+    try {
+      const res = await fetch("http://127.0.0.1:5000/api/time-constraints", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason, date, fromTime, toTime }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("Saved successfully!");
+        navigation.goBack();
+      } else {
+        alert("Error: " + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server Error");
+    }
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#F5E6DA" }}>
+    <View style={styles.page}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="black" />
+          <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}> Add Time Constraint</Text>
-        <Ionicons name="notifications-outline" size={24} color="black" />
+        <Text style={styles.title}>Add Time Constraint</Text>
+        <Ionicons name="notifications-outline" size={24} color="white" />
       </View>
-      <View style={{ margin: 20 }}>
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            width: "100%",
-            justifyContent: "space-between",
-          }}
-        >
-          <Text>Reason:</Text>
+
+      {/* Form */}
+      <View style={styles.card}>
+        {/* Reason */}
+        <Text style={styles.label}>Reason</Text>
+        <View style={styles.pickerBox}>
           <Picker
-            selectedValue={selectedReason}
-            onValueChange={(itemValue) => setSelectedReason(itemValue)}
-            style={{ width: "50%" }}
+            selectedValue={reason}
+            onValueChange={(val) => setReason(val)}
+            style={styles.picker}
           >
-            <Picker.Item label="Reason" value="Reason" />
+            <Picker.Item label="Sickness" value="Sickness" />
             <Picker.Item label="Meeting" value="Meeting" />
             <Picker.Item label="Break" value="Break" />
+            <Picker.Item label="Engagement" value="Engagement" />
+            <Picker.Item label="Other" value="Other" />
           </Picker>
         </View>
 
-        <Text>Date:</Text>
-        <TouchableOpacity
-          onPress={showDatePicker}
-          style={{ padding: 10, backgroundColor: "#fff", marginBottom: 10 }}
-        >
-          <Text style={{ marginTop: 20 }}>
-            {selectedDate || "Choose your date"}
-          </Text>
-        </TouchableOpacity>
+        {/* Date */}
+        <Text style={styles.label}>Date</Text>
+        <Button
+          title={date || "Choose Date"}
+          onPress={() => setOpenDateModal(true)}
+          color="#6C91BF"
+        />
 
-        <Text style={{ marginTop: 20 }}>From:</Text>
-        <TouchableOpacity
-          onPress={() => showTimePicker("from")}
-          style={{ padding: 10, backgroundColor: "#fff", marginBottom: 10 }}
-        >
-          <Text>{fromTime}</Text>
-        </TouchableOpacity>
-
-        <Text style={{ marginTop: 20 }}>To:</Text>
-        <TouchableOpacity
-          onPress={() => showTimePicker("to")}
-          style={{ padding: 10, backgroundColor: "#fff", marginBottom: 10 }}
-        >
-          <Text>{toTime}</Text>
-        </TouchableOpacity>
-
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: 20,
+        {/* From Time */}
+        <Text style={styles.label}>From</Text>
+        <Button
+          style={styles.button}
+          title={fromTime}
+          onPress={() => {
+            setTimeType("from");
+            setOpenTimeModal(true);
           }}
-        >
-          <TouchableOpacity>
-            <Text style={{ color: "blue" }} onPress={() => navigation.goBack()}>
-              Cancel
-            </Text>
+          color="#6C91BF"
+        />
+
+        {/* To Time */}
+        <Text style={styles.label}>To</Text>
+        <Button
+          style={styles.button}
+          title={toTime}
+          onPress={() => {
+            setTimeType("to");
+            setOpenTimeModal(true);
+          }}
+          color="#6C91BF"
+        />
+
+        {/* Action Buttons */}
+        <View style={styles.buttons}>
+          <TouchableOpacity
+            style={styles.cancel}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.buttonText}>Cancel</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={{ color: "blue" }}>Save</Text>
+          <TouchableOpacity style={styles.save} onPress={handleSave}>
+            <Text style={styles.buttonText}>Save</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleDateConfirm}
-        onCancel={hideDatePicker}
+      {/* Modals */}
+      <ChooseDate
+        visible={openDateModal}
+        onClose={() => setOpenDateModal(false)}
+        onDateSelected={(pickedDate) => {
+          setDate(pickedDate);
+          setOpenDateModal(false);
+        }}
       />
-
-      <DateTimePickerModal
-        isVisible={isTimePickerVisible}
-        mode="time"
-        onConfirm={handleTimeConfirm}
-        onCancel={hideTimePicker}
+      <ChooseTime
+        visible={openTimeModal}
+        onClose={() => setOpenTimeModal(false)}
+        onTimeSelected={(pickedTime) => {
+          timeType === "from" ? setFromTime(pickedTime) : setToTime(pickedTime);
+          setOpenTimeModal(false);
+        }}
       />
     </View>
   );
 };
+
 const styles = StyleSheet.create({
+  page: { flex: 1, backgroundColor: "#F5E6DA" },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#6c91bf",
+    backgroundColor: "#6C91BF",
     paddingTop: 50,
   },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
+  title: { fontSize: 18, color: "white", fontWeight: "bold" },
+  card: {
+    backgroundColor: "white",
+    margin: 20,
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 5,
   },
+  label: { marginVertical: 10, fontSize: 16, fontWeight: "600" },
+  pickerBox: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  picker: { height: 50, width: "100%" },
+  buttons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 30,
+  },
+  cancel: {
+    backgroundColor: "red",
+    padding: 12,
+    paddingHorizontal: 25,
+    borderRadius: 8,
+  },
+  save: {
+    backgroundColor: "green",
+    padding: 12,
+    paddingHorizontal: 25,
+    borderRadius: 8,
+  },
+
+  buttonText: { color: "white", fontWeight: "bold" },
 });
+
 export default AddTimeConstraint;

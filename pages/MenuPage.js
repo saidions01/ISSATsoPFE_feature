@@ -26,14 +26,17 @@ const MenuPage = ({ onClose, navigation }) => {
         <Text style={styles.text}>Identify Time Constraint</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuItem}>
+      <TouchableOpacity
+        style={styles.menuItem}
+        onPress={() => navigation.navigate("GenerateTimeTable")}
+      >
         <Ionicons name="document-text-outline" size={20} color="black" />
-        <Text style={styles.text}>Consult Reports</Text>
+        <Text style={styles.text}>Generate Time Table</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-      style={styles.menuItem}
-      onPress={() => navigation.navigate("ConsultListOfStudents")}
+      <TouchableOpacity
+        style={styles.menuItem}
+        onPress={() => navigation.navigate("ConsultListOfStudents")}
       >
         <Ionicons name="list-outline" size={20} color="black" />
         <Text style={styles.text}>List of Students</Text>

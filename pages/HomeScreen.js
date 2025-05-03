@@ -1,54 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import axios from "axios"; // Import axios to make API calls
 import MenuPage from "./MenuPage";
 import BottomNav from "./components/BottomNav";
-const { width } = Dimensions.get("window");
-
-const events = [
-  {
-    id: "1",
-    title: "Android Development",
-    date: "20-02-2025",
-    location: "M11",
-    time: "08:00 - 10:00",
-  },
-  {
-    id: "2",
-    title: "Android Development",
-    date: "21-02-2025",
-    location: "G14",
-    time: "08:00 - 10:00",
-  },
-  {
-    id: "3",
-    title: "Android Development",
-    date: "22-02-2025",
-    location: "M11",
-    time: "08:00 - 10:00",
-  },
-  {
-    id: "4",
-    title: "Android Development",
-    date: "22-02-2025",
-    location: "M11",
-    time: "08:00 - 10:00",
-  },
-];
 
 const HomeScreen = ({ navigation }) => {
   const [menuVisible, setMenuVisible] = useState(false);
+  const [soutenances, setSoutenances] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
   };
+
+  const fetchSoutenances = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("http://127.0.0.1:5000/api/soutenances");
+      if (response.data && response.data.soutenances) {
+        setSoutenances(response.data.soutenances);
+      } else {
+        Alert.alert("Error", "No soutenances found.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to fetch soutenances. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSoutenances();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -64,30 +55,37 @@ const HomeScreen = ({ navigation }) => {
       </View>
 
       {/* Events List */}
-      <FlatList
-        style={styles.eventsContainer}
-        data={events}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.eventTitle}>
-              {item.title} <Ionicons name="chevron-down" size={16} />
-            </Text>
-            <View style={styles.eventInfo}>
-              <Ionicons name="calendar" size={16} />
-              <Text> {item.date}</Text>
+      {loading ? (
+        <Text style={styles.loadingText}>Loading soutenances...</Text>
+      ) : (
+        <FlatList
+          style={styles.eventsContainer}
+          data={soutenances}
+          keyExtractor={(item, index) =>
+            item?.id?.toString() ?? index.toString()
+          }
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Text style={styles.eventTitle}>
+                {item.sujetPfeId?.title || "Unknown Title"}{" "}
+                <Ionicons name="chevron-down" size={16} />
+              </Text>
+              <View style={styles.eventInfo}>
+                <Ionicons name="calendar" size={16} />
+                <Text> {item.date}</Text>
+              </View>
+              <View style={styles.eventInfo}>
+                <Ionicons name="location" size={16} />
+                <Text> {item.salleId?.name || "Unknown Salle"}</Text>
+              </View>
+              <View style={styles.eventInfo}>
+                <Ionicons name="time" size={16} />
+                <Text> {item.time}</Text>
+              </View>
             </View>
-            <View style={styles.eventInfo}>
-              <Ionicons name="location" size={16} />
-              <Text> {item.location}</Text>
-            </View>
-            <View style={styles.eventInfo}>
-              <Ionicons name="time" size={16} />
-              <Text> {item.time}</Text>
-            </View>
-          </View>
-        )}
-      />
+          )}
+        />
+      )}
 
       {/* Bottom Navigation */}
       <BottomNav navigation={navigation} />
@@ -136,6 +134,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 5,
+  },
+  loadingText: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "gray",
   },
   bottomNav: {
     flexDirection: "row",
