@@ -5,12 +5,16 @@ import {
   TouchableOpacity,
   StyleSheet,
   FlatList,
+  SafeAreaView,
+  StatusBar,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+
 import BottomNav from "./components/BottomNav";
+import Header from "./Header";
 
 const ConsultListOfStudents = ({ navigation }) => {
   const [students, setStudents] = useState([]);
+  const [showAll, setShowAll] = useState(false);
 
   const fetchStudents = async () => {
     try {
@@ -31,12 +35,18 @@ const ConsultListOfStudents = ({ navigation }) => {
       <Text style={[styles.headerText, styles.column]}>Nom</Text>
       <Text style={[styles.headerText, styles.column]}>Prenom</Text>
       <Text style={[styles.headerText, styles.column]}>CIN</Text>
-      <Text style={[styles.headerText, styles.column]}>Filiere</Text>
+      <Text style={[styles.headerText, styles.column]}>Filière</Text>
     </View>
   );
 
-  const TableRow = ({ item }) => (
-    <View style={[styles.row, styles.rowBackground]}>
+  const TableRow = ({ item, index }) => (
+    <View
+      style={[
+        styles.row,
+        index % 2 === 0 ? styles.rowEven : styles.rowOdd,
+        styles.rowBody,
+      ]}
+    >
       <Text style={[styles.cell, styles.column]}>{item.lastName}</Text>
       <Text style={[styles.cell, styles.column]}>{item.name}</Text>
       <Text style={[styles.cell, styles.column]}>{item.cin}</Text>
@@ -44,26 +54,38 @@ const ConsultListOfStudents = ({ navigation }) => {
     </View>
   );
 
+  const toggleShowAll = () => setShowAll((prev) => !prev);
+
+  const displayedStudents = showAll ? students : students.slice(0, 10);
+
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        onPress={() => navigation.navigate("MenuPage")}
-        style={styles.menuButton}
-      >
-        <Ionicons name="menu" size={28} color="white" />
-      </TouchableOpacity>
+    <View style={styles.wrapper}>
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" />
+        <Header navigation={navigation} />
 
-      <Text style={styles.title}>Liste des Etudiants</Text>
+        <Text style={styles.title}>Liste des Étudiants</Text>
 
-      <View style={styles.tableContainer}>
-        <TableHeader />
-        <FlatList
-          data={students}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => <TableRow item={item} />}
-          contentContainerStyle={styles.listContent}
-        />
-      </View>
+        <View style={styles.tableContainer}>
+          <TableHeader />
+          <FlatList
+            data={displayedStudents}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item, index }) => (
+              <TableRow item={item} index={index} />
+            )}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+          />
+          {students.length > 10 && (
+            <TouchableOpacity onPress={toggleShowAll} style={styles.showMoreBtn}>
+              <Text style={styles.showMoreText}>
+                {showAll ? "Voir moins" : "Voir plus"}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </SafeAreaView>
 
       <View style={styles.bottomNavWrapper}>
         <BottomNav navigation={navigation} />
@@ -73,52 +95,64 @@ const ConsultListOfStudents = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#6091BA",
+  wrapper: {
     flex: 1,
-    padding: 16,
+    backgroundColor: "white",
   },
-  menuButton: {
+  container: {
+    flex: 1,
+    paddingBottom: 80,
+  },
+  bottomNavWrapper: {
     position: "absolute",
-    top: 50,
-    left: 20,
-    zIndex: 1,
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   title: {
-    color: "white",
-    fontSize: 24,
+    color: "black",
+    fontSize: 26,
     fontWeight: "bold",
-    marginTop: 80,
-    marginBottom: 20,
+    marginTop: 10,
     textAlign: "center",
+    marginBottom: 16,
   },
   tableContainer: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    overflow: "hidden",
-    marginTop: 20,
-    elevation: 3,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    width: "90%",
+    marginHorizontal: 20,
+    marginBottom: 20,
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 12,
-    paddingHorizontal: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 10,
   },
   header: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#e6f0ff",
     borderBottomWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#ccc",
   },
-  rowBackground: {
-    backgroundColor: "white",
+  rowBody: {
+    borderBottomWidth: 1,
+    borderColor: "#f2f2f2",
+  },
+  rowEven: {
+    backgroundColor: "#f9f9f9",
+  },
+  rowOdd: {
+    backgroundColor: "#ffffff",
   },
   headerText: {
     fontWeight: "bold",
+    fontSize: 14,
     color: "#333",
   },
   cell: {
-    color: "#666",
+    fontSize: 14,
+    color: "#444",
   },
   column: {
     flex: 1,
@@ -126,14 +160,17 @@ const styles = StyleSheet.create({
     minWidth: 80,
   },
   listContent: {
-    paddingBottom: 16,
+    paddingBottom: 20,
   },
-  bottomNavWrapper: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "#f0f0f0",
+  showMoreBtn: {
+    alignItems: "center",
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderColor: "#ddd",
+  },
+  showMoreText: {
+    color: "#0066cc",
+    fontWeight: "bold",
   },
 });
 

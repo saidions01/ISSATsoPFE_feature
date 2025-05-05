@@ -17,6 +17,7 @@ import ProfessorsListScreen from "./pages/ProfessorsListScreen.js";
 import UploadProfessors from "./pages/UploadProfessors.js";
 import ModifyEventsScreen from "./pages/ModifyEventsScreen.js";
 import GenerateTimeTableScreen from "./pages/GenerateTimeTableScreen.js";
+import TimeTable from "./pages/TimeTable.js";
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -50,6 +51,10 @@ export default function App() {
         <Stack.Screen
           name="GenerateTimeTable"
           component={GenerateTimeTableScreen}
+        />
+         <Stack.Screen
+          name="TimeTable"
+          component={TimeTable}
         />
       </Stack.Navigator>
     </NavigationContainer>

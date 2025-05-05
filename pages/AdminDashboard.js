@@ -1,42 +1,33 @@
-import React, { useState, useRef } from "react";
-import { View, Text, StyleSheet } from "react-native";
-
+import React from "react";
+import { View, StyleSheet, ScrollView } from "react-native";
 import ProfessorsListScreen from "./ProfessorsListScreen";
 import { useNavigation } from "@react-navigation/native";
 import AdminNav from "./components/AdminNav";
+import AdminHeader from "./AdminHeader";
 
 const AdminDashboard = () => {
   const navigation = useNavigation();
+
   return (
-    <View style={styles.container}>
+    <View style={styles.wrapper}>
+      <AdminHeader navigation={navigation} />
+
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ProfessorsListScreen />
+      </ScrollView>
+
       <AdminNav navigation={navigation} />
-      <ProfessorsListScreen />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#7da6cf",
-    width: "100%",
-    height: "100%",
+  wrapper: {
+    flex: 1,
+    backgroundColor: "white",
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: "#333",
-    padding: 15,
-    marginBottom: 20,
-    borderRadius: 10,
-    alignItems: "center",
-    width: "80%",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
+  scrollContent: {
+    paddingBottom: 20, // leave space for bottom nav
   },
 });
 

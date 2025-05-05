@@ -1,4 +1,3 @@
-// UploadStudents.js
 import React, { useState, useRef } from "react";
 import {
   View,
@@ -7,9 +6,12 @@ import {
   StyleSheet,
   Platform,
   Alert,
+  ScrollView,
 } from "react-native";
 import * as XLSX from "xlsx";
 import { Ionicons } from "@expo/vector-icons";
+import Header from "./Header";
+import ButtomNav from "./components/BottomNav";
 
 const UploadStudents = ({ navigation }) => {
   const [fileData, setFileData] = useState(null);
@@ -21,12 +23,10 @@ const UploadStudents = ({ navigation }) => {
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const arrayBuffer = event.target.result;
       try {
-        const workbook = XLSX.read(arrayBuffer, { type: "array" });
+        const workbook = XLSX.read(event.target.result, { type: "array" });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const data = XLSX.utils.sheet_to_json(sheet);
-
         const formatted = data.map((student) => ({
           name: student.name || "",
           lastName: student.lastName || "",
@@ -35,7 +35,6 @@ const UploadStudents = ({ navigation }) => {
           fieldOfStudy: student.fieldOfStudy || "",
           department: student.department || "",
         }));
-
         setFileData(formatted);
       } catch (error) {
         console.error("Error reading file:", error);
@@ -61,16 +60,13 @@ const UploadStudents = ({ navigation }) => {
     }
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/upload-students",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ students: fileData }),
-        }
-      );
+      const response = await fetch("http://localhost:5000/api/upload-students", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ students: fileData }),
+      });
 
       const contentType = response.headers.get("content-type");
 
@@ -91,67 +87,94 @@ const UploadStudents = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        onPress={() => navigation.navigate("Home")}
-        style={styles.backButton}
-      >
-        <Ionicons name="arrow-back" size={24} color="#fff" />
-      </TouchableOpacity>
+    <View style={styles.screen}>
+      <Header navigation={navigation} />
 
-      <Text style={styles.title}>Upload your students' sheet</Text>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>Upload Students Sheet</Text>
+        <Text style={styles.subtitle}>
+          Please upload an Excel file (.xlsx) containing the student data.
+        </Text>
 
-      <TouchableOpacity style={styles.button} onPress={selectFile}>
-        <Text style={styles.buttonText}>Select Students File (.xlsx)</Text>
-      </TouchableOpacity>
+        <View style={styles.card}>
+          <TouchableOpacity style={styles.actionButton} onPress={selectFile}>
+            <Ionicons name="cloud-upload-outline" size={22} color="#fff" />
+            <Text style={styles.buttonText}>Select Students File</Text>
+          </TouchableOpacity>
 
-      {Platform.OS === "web" && (
-        <input
-          type="file"
-          accept=".xlsx"
-          ref={fileInputRef}
-          style={{ display: "none" }}
-          onChange={handleFileChangeWeb}
-        />
-      )}
+          {Platform.OS === "web" && (
+            <input
+              type="file"
+              accept=".xlsx"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              onChange={handleFileChangeWeb}
+            />
+          )}
 
-      <TouchableOpacity style={styles.button} onPress={handleUpload}>
-        <Text style={styles.buttonText}>Upload Students</Text>
-      </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton} onPress={handleUpload}>
+            <Ionicons name="checkmark-done-outline" size={22} color="#fff" />
+            <Text style={styles.buttonText}>Upload Students</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+
+      <ButtomNav navigation={navigation} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    alignItems: "center",
+  screen: {
     flex: 1,
-    backgroundColor: "#7da6cf",
-    paddingTop: 50,
-    width: "100%",
+    backgroundColor: "#f3f7fc",
+  },
+  container: {
+    flexGrow: 1,
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "bold",
-    marginBottom: 20,
+    color: "#2b3e50",
+    marginBottom: 10,
   },
-  button: {
-    backgroundColor: "#333",
-    padding: 15,
-    marginBottom: 20,
-    borderRadius: 10,
+  subtitle: {
+    fontSize: 14,
+    color: "#5c6c7d",
+    marginBottom: 25,
+    textAlign: "center",
+    paddingHorizontal: 20,
+  },
+  card: {
+    width: "100%",
+    maxWidth: 400,
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    padding: 20,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  actionButton: {
+    flexDirection: "row",
+    backgroundColor: "#4a90e2",
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
     alignItems: "center",
-    width: "80%",
+    justifyContent: "center",
+    marginBottom: 20,
+    gap: 10,
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
-  },
-  backButton: {
-    position: "absolute",
-    top: 40,
-    left: 20,
-    zIndex: 10,
+    fontWeight: "600",
   },
 });
 

@@ -9,7 +9,8 @@ import {
   Button,
 } from "react-native";
 import * as XLSX from "xlsx";
-import { Ionicons } from "@expo/vector-icons";
+import AdminHeader from "./AdminHeader";
+import AdminNav from "./components/AdminNav";
 
 const UploadProfessors = ({ navigation }) => {
   const [fileData, setFileData] = useState(null);
@@ -74,6 +75,7 @@ const UploadProfessors = ({ navigation }) => {
       Alert.alert("Error", "Failed to upload data.");
     }
   };
+
   const handleCreateAccounts = async () => {
     try {
       const response = await fetch(
@@ -98,14 +100,11 @@ const UploadProfessors = ({ navigation }) => {
   };
 
   return (
+    <View style={{ flex: 1, backgroundColor:"#fff" }}>
+       <AdminHeader />
     <View style={styles.container}>
-      <TouchableOpacity
-        onPress={() => navigation.navigate("AdminDashboard")}
-        style={styles.backButton}
-      >
-        <Ionicons name="arrow-back" size={24} color="#fff" />
-      </TouchableOpacity>
-      <Text style={styles.title}>Upload your professors' sheet </Text>
+     
+      <Text style={styles.title}>Upload your professors' sheet</Text>
 
       <TouchableOpacity style={styles.button} onPress={selectFile}>
         <Text style={styles.buttonText}>Select Professors File (.xlsx)</Text>
@@ -125,29 +124,31 @@ const UploadProfessors = ({ navigation }) => {
         <Text style={styles.buttonText}>Upload Data</Text>
       </TouchableOpacity>
 
-      <Button
-        title="Create Professor Accounts"
-        onPress={handleCreateAccounts}
-      />
+      <Button title="Create Professor Accounts" onPress={handleCreateAccounts} />
+
+      <AdminNav navigation={navigation} />
+    </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+
   container: {
     alignItems: "center",
     flex: 1,
-    backgroundColor: "#7da6cf",
-    paddingTop: 50,
+    backgroundColor: "#fff",
+
     width: "100%",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
+    marginTop: 20,
   },
   button: {
-    backgroundColor: "#333",
+    backgroundColor: "#3A7CA5",
     padding: 15,
     marginBottom: 20,
     borderRadius: 10,
@@ -155,14 +156,10 @@ const styles = StyleSheet.create({
     width: "80%",
   },
   buttonText: {
-    color: "#fff",
+    color: "black",
     fontSize: 16,
-  },
-  backButton: {
-    position: "absolute",
-    top: 40,
-    left: 20,
-    zIndex: 10,
+    fontWeight : "bold"
+
   },
 });
 

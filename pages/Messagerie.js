@@ -8,6 +8,8 @@ import {
   StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import BottomNavigation from "./components/BottomNav";
+import Header from "./Header";
 
 const messages = [
   {
@@ -25,7 +27,7 @@ const messages = [
   {
     id: "3",
     name: "Mitch",
-    message: "🔥",
+    message: "Monsieur, I have a question about your...",
     avatar: "https://randomuser.me/api/portraits/men/3.jpg",
   },
   {
@@ -39,14 +41,7 @@ const messages = [
 const Messagerie = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Messagerie</Text>
-        <Ionicons name="notifications-outline" size={24} color="black" />
-      </View>
+   <Header navigation={navigation} />
 
       {/* Messages List */}
       <FlatList
@@ -62,6 +57,7 @@ const Messagerie = ({ navigation }) => {
           </TouchableOpacity>
         )}
       />
+         <BottomNavigation navigation={navigation} />
     </View>
   );
 };
@@ -69,7 +65,7 @@ const Messagerie = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fdecd2",
+    backgroundColor: "white",
   },
   header: {
     flexDirection: "row",

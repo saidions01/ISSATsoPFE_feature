@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#FFEFE0",
+    backgroundColor: "white",
   },
   level1Dots: {
     top: 50,
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#FFEFE0",
+    backgroundColor: "white",
   },
   logo: {
     width: 340,

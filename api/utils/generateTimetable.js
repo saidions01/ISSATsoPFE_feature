@@ -1,78 +1,152 @@
-const mongoose = require("mongoose");
-const Soutenance = require("../models/Soutenance");
-const SujetPFE = require("../models/SujetPFE");
-const Salle = require("../models/Salle");
-const User = require("../models/User");
+const { addDays, isBefore, format, getDay } = require("date-fns");
 
-async function generateSoutenances() {
-  try {
-    await mongoose.connect("mongodb://127.0.0.1:27017/studentUploaderDB", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+async function generateSoutenances({
+  sujets,
+  salles,
+  professors,
+  timeConstraints,
+  startDate,
+  endDate,
+  saveSoutenance,
+  updateSujet,
+}) {
+  const roomAvailability = {}; // { "yyyy-MM-dd": { "08:00": salleId } }
+  const professorAvailability = {}; // { profId: { "yyyy-MM-dd": [slots...] } }
+  const professorDailyCount = {}; // { profId: { "yyyy-MM-dd": count } }
 
-    console.log("✅ Connected to MongoDB");
+  const isWeekend = (date) => getDay(date) === 6 || getDay(date) === 0;
 
-    const sujets = await SujetPFE.find();
-    const salles = await Salle.find();
-    const professors = await User.find({ role: "professor" });
+  const start = new Date(startDate);
+  const end = new Date(endDate);
 
-    if (sujets.length === 0 || salles.length === 0 || professors.length < 3) {
-      console.error("❌ Not enough data to generate soutenances");
-      process.exit(1);
-    }
+  const twoHourSlots = ["08:00", "10:00", "12:00", "14:00", "16:00"];
 
-    const startDate = new Date(); // today
-    startDate.setHours(0, 0, 0, 0); // clean time part
+  let scheduled = 0;
+  let skipped = 0;
+  let errors = 0;
 
-    const soutenancesPerDay = 5;
-    const timeSlots = ["08:00", "09:30", "11:00", "13:00", "14:30"];
+  const getConstraint = (profId) => {
+    const constraint = timeConstraints.find((tc) => tc.professorId === profId);
+    return constraint ? constraint.unavailableTimes : [];
+  };
 
-    let currentDay = new Date(startDate);
-
-    let timeSlotIndex = 0;
-
-    for (let i = 0; i < sujets.length; i++) {
-      if (timeSlotIndex >= soutenancesPerDay) {
-        // move to next day
-        currentDay.setDate(currentDay.getDate() + 1);
-        timeSlotIndex = 0;
+  for (const sujet of sujets) {
+    try {
+      if (sujet.soutenance) {
+        skipped++;
+        continue;
       }
 
-      const randomSalle = salles[Math.floor(Math.random() * salles.length)];
-      const assignedProfessors = [];
+      const president = professors.find((p) => p.name === sujet.president);
+      const reporter = professors.find((p) => p.name === sujet.reporter);
+      const encadrant = professors.find((p) => p.name === sujet.encadrant);
 
-      // Pick 3 random professors
-      while (assignedProfessors.length < 3) {
-        const randomProf =
-          professors[Math.floor(Math.random() * professors.length)];
-        if (!assignedProfessors.includes(randomProf._id)) {
-          assignedProfessors.push(randomProf._id);
+      if (!president || !reporter || !encadrant) {
+        skipped++;
+        continue;
+      }
+
+      let date = new Date(start);
+      let scheduledForThisSujet = false;
+
+      while (isBefore(date, end) || format(date, "yyyy-MM-dd") === format(end, "yyyy-MM-dd")) {
+        if (isWeekend(date)) {
+          date = addDays(date, 1);
+          continue;
         }
+
+        const dateStr = format(date, "yyyy-MM-dd");
+
+        // shuffle for fairness
+        const shuffledSalles = salles.sort(() => Math.random() - 0.5);
+        const shuffledSlots = twoHourSlots.sort(() => Math.random() - 0.5);
+
+        for (const salle of shuffledSalles) {
+          for (const slot of shuffledSlots) {
+            // Check room availability
+            roomAvailability[dateStr] = roomAvailability[dateStr] || {};
+            if (roomAvailability[dateStr][slot]) continue;
+
+            const professors = [president, reporter, encadrant];
+            let canSchedule = true;
+
+            for (const prof of professors) {
+              const profId = prof._id;
+
+              const dailyCount = professorDailyCount[profId]?.[dateStr] || 0;
+              if (dailyCount >= 3) {
+                canSchedule = false;
+                break;
+              }
+
+              const profSlots = professorAvailability[profId]?.[dateStr] || [];
+              if (profSlots.includes(slot)) {
+                canSchedule = false;
+                break;
+              }
+
+              const constraints = getConstraint(profId);
+              if (constraints.includes(slot)) {
+                canSchedule = false;
+                break;
+              }
+            }
+
+            if (!canSchedule) continue;
+
+            // Schedule
+            roomAvailability[dateStr][slot] = salle._id;
+
+            for (const prof of professors) {
+              const profId = prof._id;
+
+              if (!professorAvailability[profId]) professorAvailability[profId] = {};
+              if (!professorAvailability[profId][dateStr]) professorAvailability[profId][dateStr] = [];
+              professorAvailability[profId][dateStr].push(slot);
+
+              if (!professorDailyCount[profId]) professorDailyCount[profId] = {};
+              professorDailyCount[profId][dateStr] = (professorDailyCount[profId][dateStr] || 0) + 1;
+            }
+
+            const soutenance = {
+              sujetPfeId: sujet._id,
+              salleId: salle._id,
+              date: dateStr,
+              time: slot,
+              fichierPdf: null,
+              status: "Scheduled",
+              assignedProfessors: professors.map(p => p._id),
+            };
+
+            await saveSoutenance(soutenance);
+            await updateSujet(sujet._id, { soutenance: true });
+
+            console.log(`✅ Scheduled sujet ${sujet._id} on ${dateStr} at ${slot} in salle ${salle.name}`);
+            scheduled++;
+            scheduledForThisSujet = true;
+            break;
+          }
+
+          if (scheduledForThisSujet) break;
+        }
+
+        if (scheduledForThisSujet) break;
+
+        date = addDays(date, 1);
       }
 
-      const soutenance = new Soutenance({
-        sujetPfeId: sujets[i]._id,
-        salleId: randomSalle._id,
-        date: new Date(currentDay), // date only
-        time: timeSlots[timeSlotIndex],
-        assignedProfessors,
-      });
+      if (!scheduledForThisSujet) {
+        console.log(`❌ Could not schedule sujet ${sujet._id} — no available slot`);
+        skipped++;
+      }
 
-      await soutenance.save();
-      console.log(
-        `✅ Soutenance scheduled for Sujet ${sujets[i].title} at ${timeSlots[timeSlotIndex]}`
-      );
-
-      timeSlotIndex++;
+    } catch (err) {
+      console.error(`❌ Error scheduling sujet ${sujet._id}:`, err);
+      errors++;
     }
-
-    console.log("🎉 All soutenances generated!");
-    process.exit(0);
-  } catch (err) {
-    console.error("❌ Error generating soutenances:", err);
-    process.exit(1);
   }
+
+  console.log(`✅ Finished: ${scheduled} scheduled, ${skipped} skipped, ${errors} errors`);
 }
 
 module.exports = { generateSoutenances };

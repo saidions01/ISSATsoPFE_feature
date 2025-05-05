@@ -14,7 +14,6 @@ const Soutenance = require("./models/Soutenance.js");
 
 
 
-
 const app = express();
 const PORT = 5000;
 
@@ -47,14 +46,49 @@ app.use("/api", timeConstraintRoutes);
 app.get("/api/soutenances", async (req, res) => {
   try {
     const soutenances = await Soutenance.find()
-      .populate("salleId", "name") // Only bring salle name
-      .populate("sujetPfeId", "title"); // Only bring sujetPfe title
+      .populate("salleId", "name") 
+      .populate("sujetPfeId", "title"); 
 
     res.json({ soutenances });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+app.get("/api/soutenances/stats", async (req, res) => {
+  try {
+    const soutenances = await Soutenance.find(); // get all
+
+    const numberOfProjects = soutenances.length;
+    const totalHours = numberOfProjects * 2;
+
+    res.json({
+      totalHours,
+      numberOfProjects,
+    });
+  } catch (error) {
+    console.error("Error fetching soutenance stats:", error);
+    res.status(500).json({ error: "Failed to fetch stats" });
+  }
+});
+
+app.post("/api/test/generate-timetable", async (req, res) => {
+  try {
+    const result = await generateSoutenances();
+
+    if (result.success) {
+      res.status(200).json({ success: true, message: result.message });
+    } else {
+      res.status(500).json({ success: false, message: "Generation failed." });
+    }
+  } catch (error) {
+    console.error("Error generating timetable:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+
+
 mongoose
   .connect("mongodb://127.0.0.1:27017/studentUploaderDB")
   .then(() => console.log("✅ MongoDB connected"))

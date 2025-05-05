@@ -1,12 +1,21 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Button } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Button,
+  Platform,
+} from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Ionicons } from "@expo/vector-icons";
 import ChooseDate from "./components/ChooseDate";
 import ChooseTime from "./components/ChooseTime";
+import Header from "./Header";
+import BottomNav from "./components/BottomNav";
 
 const AddTimeConstraint = ({ navigation }) => {
-  const [reason, setReason] = useState("Reason");
+  const [reason, setReason] = useState("Sickness");
   const [date, setDate] = useState(null);
   const [fromTime, setFromTime] = useState("13:30");
   const [toTime, setToTime] = useState("15:00");
@@ -19,6 +28,7 @@ const AddTimeConstraint = ({ navigation }) => {
       alert("Please fill all fields");
       return;
     }
+
     try {
       const res = await fetch("http://127.0.0.1:5000/api/time-constraints", {
         method: "POST",
@@ -40,24 +50,17 @@ const AddTimeConstraint = ({ navigation }) => {
 
   return (
     <View style={styles.page}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="white" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Add Time Constraint</Text>
-        <Ionicons name="notifications-outline" size={24} color="white" />
-      </View>
+    <Header navigation={navigation} />
 
-      {/* Form */}
+      {/* Form Card */}
       <View style={styles.card}>
-        {/* Reason */}
         <Text style={styles.label}>Reason</Text>
         <View style={styles.pickerBox}>
           <Picker
             selectedValue={reason}
             onValueChange={(val) => setReason(val)}
-            style={styles.picker}
+            style={Platform.OS === "android" ? styles.picker : undefined}
+            itemStyle={{ fontSize: 20}}
           >
             <Picker.Item label="Sickness" value="Sickness" />
             <Picker.Item label="Meeting" value="Meeting" />
@@ -67,47 +70,45 @@ const AddTimeConstraint = ({ navigation }) => {
           </Picker>
         </View>
 
-        {/* Date */}
         <Text style={styles.label}>Date</Text>
-        <Button
-          title={date || "Choose Date"}
+        <TouchableOpacity
+          style={styles.selectButton}
           onPress={() => setOpenDateModal(true)}
-          color="#6C91BF"
-        />
+        >
+          <Text style={styles.selectText}>{date || "Choose Date"}</Text>
+        </TouchableOpacity>
 
-        {/* From Time */}
         <Text style={styles.label}>From</Text>
-        <Button
-          style={styles.button}
-          title={fromTime}
+        <TouchableOpacity
+          style={styles.selectButton}
           onPress={() => {
             setTimeType("from");
             setOpenTimeModal(true);
           }}
-          color="#6C91BF"
-        />
+        >
+          <Text style={styles.selectText}>{fromTime}</Text>
+        </TouchableOpacity>
 
-        {/* To Time */}
         <Text style={styles.label}>To</Text>
-        <Button
-          style={styles.button}
-          title={toTime}
+        <TouchableOpacity
+          style={styles.selectButton}
           onPress={() => {
             setTimeType("to");
             setOpenTimeModal(true);
           }}
-          color="#6C91BF"
-        />
+        >
+          <Text style={styles.selectText}>{toTime}</Text>
+        </TouchableOpacity>
 
-        {/* Action Buttons */}
-        <View style={styles.buttons}>
+        {/* Buttons */}
+        <View style={styles.buttonGroup}>
           <TouchableOpacity
-            style={styles.cancel}
+            style={[styles.button, styles.cancel]}
             onPress={() => navigation.goBack()}
           >
             <Text style={styles.buttonText}>Cancel</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.save} onPress={handleSave}>
+          <TouchableOpacity style={[styles.button, styles.save]} onPress={handleSave}>
             <Text style={styles.buttonText}>Save</Text>
           </TouchableOpacity>
         </View>
@@ -130,59 +131,102 @@ const AddTimeConstraint = ({ navigation }) => {
           setOpenTimeModal(false);
         }}
       />
+
+<View style={styles.bottomNavWrapper}>
+        <BottomNav navigation={navigation} />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: "#F5E6DA" },
+  page: {
+    flex: 1,
+    backgroundColor: "#F5F5F5",
+  },
+  bottomNavWrapper: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
   header: {
+    backgroundColor: "#4A90E2",
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 20,
-    backgroundColor: "#6C91BF",
-    paddingTop: 50,
   },
-  title: { fontSize: 18, color: "white", fontWeight: "bold" },
+  headerTitle: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
   card: {
-    backgroundColor: "white",
+    backgroundColor: "#fff",
     margin: 20,
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 20,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
-    elevation: 5,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  label: { marginVertical: 10, fontSize: 16, fontWeight: "600" },
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginTop: 15,
+    marginBottom: 5,
+    color: "#333",
+  },
   pickerBox: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
+   
+   height: 20 ,
+    borderRadius: 10,
     overflow: "hidden",
+    marginBottom: 10,
   },
-  picker: { height: 50, width: "100%" },
-  buttons: {
+  picker: {
+    height: 55,
+    width: "100%",
+  },
+  selectButton: {
+    backgroundColor: "#EEF2F7",
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    marginTop: 5,
+  },
+  selectText: {
+    fontSize: 16,
+    color: "#111827",
+  },
+  buttonGroup: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 30,
   },
+  button: {
+    flex: 0.48,
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: "center",
+  },
   cancel: {
-    backgroundColor: "red",
-    padding: 12,
-    paddingHorizontal: 25,
-    borderRadius: 8,
+    backgroundColor: "#EF4444",
   },
   save: {
-    backgroundColor: "green",
-    padding: 12,
-    paddingHorizontal: 25,
-    borderRadius: 8,
+    backgroundColor: "#10B981",
   },
-
-  buttonText: { color: "white", fontWeight: "bold" },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });
 
 export default AddTimeConstraint;

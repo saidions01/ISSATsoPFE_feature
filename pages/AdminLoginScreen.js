@@ -85,7 +85,7 @@ const AdminLoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fdeedc",
+    backgroundColor: "white",
   },
   image: {
     position: "absolute",
@@ -93,10 +93,10 @@ const styles = StyleSheet.create({
     height: height * 0.4,
     top: 0,
     left: 0,
-    opacity: 0.8,
+   
   },
   form: {
-    backgroundColor: "#fdeedc",
+    backgroundColor: "white",
     width: "100%",
     height: "60%",
     padding: 20,
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   button: {
-    backgroundColor: "#333",
+    backgroundColor: "#0f9dff",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
